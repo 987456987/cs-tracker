@@ -1,0 +1,55 @@
+.de_inferno {
+    background-image: url("../assets/images/maps/de_inferno.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_ancient {
+    background-image: url("../assets/images/maps/de_ancient.jpeg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_anubis {
+    background-image: url("../assets/images/maps/de_anubis.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_mirage {
+    background-image: url("../assets/images/maps/de_mirage.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_nuke {
+    background-image: url("../assets/images/maps/de_nuke.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_overpass {
+    background-image: url("../assets/images/maps/de_overpass.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_vertigo {
+    background-image: url("../assets/images/maps/de_vertigo.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .de_dust2 {
+    background-image: url("../assets/images/maps/de_dust2.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .winner {
+    color: lightgreen;
+  }
+
+  .loser {
+    color: lightcoral;
+  }

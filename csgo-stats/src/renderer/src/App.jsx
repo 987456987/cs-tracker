@@ -60,7 +60,7 @@ function getData(requestData, setData, setFetchTime) {
     })
 }
 
-function checkData(requestData, setData) {
+function checkData(requestData) {
   fetch('http://localhost:8080/check-matches', {
     method: 'POST',
     headers: {
@@ -68,9 +68,6 @@ function checkData(requestData, setData) {
     },
     body: JSON.stringify(requestData)
   })
-    .then((data) => {
-      setData(data.matches.sort((a, b) => b.match_info.finished - a.match_info.finished))
-    })
     .catch((error) => {
       console.error('Error fetching data:', error)
     })
@@ -108,6 +105,10 @@ function App() {
     const storedUserId = localStorage.getItem('user_id')
     if (storedUserId) {
       setUserId(storedUserId)
+      const requestData = {
+        user_id: storedUserId // Use the playerID obtained from getUserID
+      }
+      checkData(requestData)
     }
   }, [])
 
@@ -146,16 +147,12 @@ function App() {
 
   console.log(data)
   console.log('Fetch time:', fetchTime ? formatDuration(fetchTime) : 'N/A')
-  const requestData = {
-    user_id: localStorage.getItem('user_id')
-  }
 
   return (
     <div className="App">
       {userId ? (
         <>
           <header className="App-header">
-            <button onClick={() => checkData(requestData, setData)}>Refresh</button>
           </header>
           <LastThree data={data} userId={userId} />
         </>

@@ -62,7 +62,7 @@ app.whenReady().then(() => {
 // Spawn the Go backend as a subprocess
 const path = require('path')
 //DEV PATH
-const combineExePath = path.join(app.getAppPath(), 'resources', 'combine.exe')
+const combineExePath = path.join(app.getAppPath(), 'resources', 'demoparser.exe')
 //BUILD PATH
 // const combineExePath = path.join(
 //   app.getAppPath(),
@@ -98,7 +98,6 @@ goBackendProcess.on('close', (code) => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     deleteFilesWithExtensions(['gz', 'dem'])
-    console.log('HERE I AM')
     app.quit()
   }
 })

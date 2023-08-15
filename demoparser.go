@@ -151,32 +151,43 @@ func main() {
 
 			//Extract data from missing matches and append to response variable
 			for i, match := range missingMatches {
-				jsonResponse.Matches = append(jsonResponse.Matches, createMatchData(match))
+				matchData := createMatchData(match)
+				jsonResponse.Matches = append(jsonResponse.Matches, matchData)
 				fmt.Println(strconv.Itoa(i+1) + " out of " + strconv.Itoa(len(missingMatches)))
+
+				// Convert players slice to JSON
+				playersJSON, err := json.Marshal(jsonResponse)
+				if err != nil {
+					fmt.Println("Error converting players to JSON:", err)
+					continue // Skip writing and move to the next iteration
+				}
+
+				// Save JSON data to the file
+				outputFile, err := os.Create(filename)
+				if err != nil {
+					fmt.Println("Error creating output file:", err)
+					continue // Skip writing and move to the next iteration
+				}
+				defer outputFile.Close()
+
+				_, err = outputFile.Write(playersJSON)
+				if err != nil {
+					fmt.Println("Error writing JSON data to file:", err)
+				}
+
+				fmt.Println("JSON data saved to players.json")
 			}
 
-			// Convert players slice to JSON
-			playersJSON, err := json.Marshal(jsonResponse)
+			dataJsonFinal, err := os.ReadFile(filename)
 			if err != nil {
-				fmt.Println("Error converting players to JSON:", err)
-			}
-			// Save JSON data to a file named "players.json" in the source folder
-			outputFile, err := os.Create(filename)
-			if err != nil {
-				fmt.Println("Error creating output file:", err)
-			}
-			defer outputFile.Close()
-
-			_, err = outputFile.Write(playersJSON)
-			if err != nil {
-				fmt.Println("Error writing JSON data to file:", err)
+				fmt.Println(err)
 			}
 
-			fmt.Println("JSON data saved to players.json")
+			fmt.Println("JSON data sent")
 
 			//Send the JSON response
 			w.WriteHeader(http.StatusOK)
-			w.Write(playersJSON)
+			w.Write(dataJsonFinal)
 		} else {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}

@@ -109,17 +109,9 @@ function App() {
         user_id: storedUserId // Use the playerID obtained from getUserID
       }
       checkData(requestData)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (userId) {
-      const requestData = {
-        user_id: userId
-      }
       getData(requestData, setData, setFetchTime)
     }
-  }, [userId]) // Fetch data when userId changes
+  }, [])
 
   const handleUserIdChange = (event) => {
     setInputValue(event.target.value)
@@ -136,6 +128,7 @@ function App() {
         const requestData = {
           user_id: playerID // Use the playerID obtained from getUserID
         }
+        checkData(requestData)
         getData(requestData, setData, setFetchTime)
       }
     }

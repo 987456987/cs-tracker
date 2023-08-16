@@ -106,48 +106,50 @@ func main() {
 
 			filename := requestData.UserID + ".json"
 
-			/////////////////////////////////////////////////////////////////////
-			//Get stored data to compare against last matches from faceitAPI
-			//Get stored matches from disk
-			dataJson, err := os.ReadFile(filename)
-			if err != nil {
-				fmt.Println(err)
-			}
-
 			// Create a variable to hold the unmarshaled JSON data
 			var data ServeData
-
-			// Unmarshal the JSON data into the variable
-			err = json.Unmarshal(dataJson, &data)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			/////////////////////////////////////////////////////////////////////
-
 			// Take requestData.UserID and make a faceit api request to get a list of matches
 			matchList := getMatchList(requestData.UserID)
 			// Var to store the matches missing from stored data
 			var missingMatches []string
-
-			for _, faceitMatch := range matchList {
-				found := false
-				for _, storedMatch := range data.Matches {
-					if faceitMatch == storedMatch.MatchInfo.MatchID {
-						found = true
-						break
-					}
-				}
-				if !found {
-					missingMatches = append(missingMatches, faceitMatch)
-					fmt.Println("Added " + faceitMatch + " to the needed match list")
-				}
-			}
-
+			//Var to store data to be served
 			var jsonResponse ServeData
 
-			//Append stored matches to response
-			jsonResponse.Matches = append(jsonResponse.Matches, data.Matches...)
+			// Check if the file exists
+			if _, err := os.Stat(filename); os.IsNotExist(err) {
+				missingMatches = append(missingMatches, matchList...)
+				fmt.Print("Doesnt Exists")
+			} else {
+				//Get stored data to compare against last matches from faceitAPI
+				//Get stored matches from disk
+				fmt.Print("Exists")
+				dataJson, err := os.ReadFile(filename)
+				if err != nil {
+					fmt.Println(err)
+				}
+				// Unmarshal the JSON data into the variable
+				err = json.Unmarshal(dataJson, &data)
+				if err != nil {
+					fmt.Println(err)
+				}
+				for _, faceitMatch := range matchList {
+					found := false
+					for _, storedMatch := range data.Matches {
+						if faceitMatch == storedMatch.MatchInfo.MatchID {
+							found = true
+							break
+						}
+					}
+					if !found {
+						missingMatches = append(missingMatches, faceitMatch)
+						fmt.Println("Added " + faceitMatch + " to the needed match list")
+					}
+				}
+				//Append stored matches to response
+				jsonResponse.Matches = append(jsonResponse.Matches, data.Matches...)
+			}
+
+			/////////////////////////////////////////////////////////////////////
 
 			//Extract data from missing matches and append to response variable
 			for i, match := range missingMatches {
@@ -181,6 +183,8 @@ func main() {
 			dataJsonFinal, err := os.ReadFile(filename)
 			if err != nil {
 				fmt.Println(err)
+				fmt.Println("Here")
+				fmt.Println(matchList)
 			}
 
 			fmt.Println("JSON data sent")
@@ -484,6 +488,7 @@ func handleDemo(matchID string) map[string]map[string]int {
 	gzReader, err := gzip.NewReader(compressedDemo)
 	if err != nil {
 		fmt.Println("Error creating gzip reader:", err)
+		return make(map[string]map[string]int)
 	}
 
 	// Create the output file for the extracted content

@@ -113,10 +113,6 @@ function App() {
   }, [])
 
   useEffect(() => {
-    setInputValue(userId)
-  }, [userId])
-
-  useEffect(() => {
     if (userId) {
       const requestData = {
         user_id: userId

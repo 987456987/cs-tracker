@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react'
 import LastThree from './components/LastThree'
 import UserIdInput from './components/UserIdInput'
+import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
+// import MatchList from './components/MatchList'
+// import Match from './components/Match'
 
 function formatDuration(durationMs) {
   if (durationMs < 1000) {
@@ -68,10 +71,9 @@ function checkData(requestData) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(requestData)
+  }).catch((error) => {
+    console.error('Error fetching data:', error)
   })
-    .catch((error) => {
-      console.error('Error fetching data:', error)
-    })
 }
 
 function getUserID(userName) {
@@ -131,24 +133,37 @@ function App() {
     }
   }
 
+  function renderHome() {
+    return userId ? (
+      <>
+        <header className="App-header"></header>
+        <LastThree data={data} userId={userId} />
+      </>
+    ) : (
+      <UserIdInput
+        handleFetchData={handleFetchData}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+      />
+    )
+  }
+
   console.log(data)
   console.log('Fetch time:', fetchTime ? formatDuration(fetchTime) : 'N/A')
 
   return (
-    <div className="App">
-      {userId ? (
-        <>
-          <header className="App-header">
-          </header>
-          <LastThree data={data} userId={userId} />
-        </>
-      ) : (
-        <UserIdInput handleFetchData={handleFetchData} inputValue={inputValue} setInputValue={setInputValue} />
-      )}
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={renderHome()} />
+          {/* <Route path="/match/:matchId" element={<Match />} /> */}
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
 export default App
 
 //52e19c3d-471c-44ac-af67-a394da815a37
+//data={data} userId={userId}

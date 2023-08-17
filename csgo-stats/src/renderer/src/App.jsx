@@ -100,6 +100,7 @@ function App() {
   const [data, setData] = useState([])
   const [fetchTime, setFetchTime] = useState(null)
   const [userId, setUserId] = useState('')
+  const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id')
@@ -142,7 +143,7 @@ function App() {
           <LastThree data={data} userId={userId} />
         </>
       ) : (
-        <UserIdInput handleFetchData={handleFetchData} />
+        <UserIdInput handleFetchData={handleFetchData} inputValue={inputValue} setInputValue={setInputValue} />
       )}
     </div>
   )

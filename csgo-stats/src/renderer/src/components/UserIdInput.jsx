@@ -1,10 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/prop-types */
-
-import { useState } from "react"
-function UserIdInput({ handleFetchData }) {
-  const [inputValue, setInputValue] = useState('')
-
+function UserIdInput({ handleFetchData, inputValue, setInputValue }) {
   const handleUserIdChange = (event) => {
     setInputValue(event.target.value)
   }

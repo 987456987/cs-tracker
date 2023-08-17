@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react'
 import LastThree from './components/LastThree'
+import UserIdInput from './components/UserIdInput'
 
 function formatDuration(durationMs) {
   if (durationMs < 1000) {
@@ -99,7 +100,6 @@ function App() {
   const [data, setData] = useState([])
   const [fetchTime, setFetchTime] = useState(null)
   const [userId, setUserId] = useState('')
-  const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id')
@@ -112,10 +112,6 @@ function App() {
       getData(requestData, setData, setFetchTime)
     }
   }, [])
-
-  const handleUserIdChange = (event) => {
-    setInputValue(event.target.value)
-  }
 
   const handleFetchData = async (event) => {
     event.preventDefault()
@@ -146,13 +142,7 @@ function App() {
           <LastThree data={data} userId={userId} />
         </>
       ) : (
-        <div>
-          <p>Please enter your user ID:</p>
-          <form onSubmit={handleFetchData}>
-            <input type="text" value={inputValue} onChange={handleUserIdChange} />
-            <button type="submit">Fetch Data</button>
-          </form>
-        </div>
+        <UserIdInput handleFetchData={handleFetchData} />
       )}
     </div>
   )

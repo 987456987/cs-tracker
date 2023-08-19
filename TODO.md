@@ -45,3 +45,11 @@ Everything to include these stats into the struct to serve is already laid out, 
 
 Get this data from faceit api to create playerStats struct and then fill in the rest from the handleDemo function.
 This allows me to keep the way I create the structs and manage the data but dont have to worry about getting all the data from the demo which may have more edge cases.
+I do have to get final score from the match stats api, so for that info I will have to make that call.
+
+
+# Plan
+- Modify the getMatchInfo() to create and return the []playerStats information that is currently being created by getPlayerData()
+- Modify getPlayerData to get final score and return just the []TeamInfo
+- Implement the rest of the stat tracking for the "What I actually need to generate" into the demoStats struct of extractDemoData()
+- Modify createMatchData() to add the rest of the data returned by extractDemoData()

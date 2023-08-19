@@ -23,13 +23,6 @@
 
 
 ## What I actually need to genereate
-- Map played
-- Team that won
-- MatchID
-
-- player.ID
-- player.Name
-- player.Team
 - player.kills
 - player.assists
 - player.deaths
@@ -39,3 +32,16 @@
 
 Most of these I already have event handlers that i can exract the data from. 
 Everything to include these stats into the struct to serve is already laid out, I just need to fill it all in
+
+
+## Faceit Match info api
+- player_id
+- nickname
+- faceit level
+- team_id
+- Team that won
+- MatchID
+- Map played
+
+Get this data from faceit api to create playerStats struct and then fill in the rest from the handleDemo function.
+This allows me to keep the way I create the structs and manage the data but dont have to worry about getting all the data from the demo which may have more edge cases.

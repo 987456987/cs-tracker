@@ -42,6 +42,7 @@ Everything to include these stats into the struct to serve is already laid out, 
 - Team that won
 - MatchID
 - Map played
+- Avatar
 
 Get this data from faceit api to create playerStats struct and then fill in the rest from the handleDemo function.
 This allows me to keep the way I create the structs and manage the data but dont have to worry about getting all the data from the demo which may have more edge cases.

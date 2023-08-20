@@ -25,26 +25,27 @@ type ServeData struct {
 }
 
 type PlayerStats struct {
-	ID                 string `json:"player_id"`
-	TeamID             string `json:"team_id"`
-	Name               string `json:"nickname"`
-	Kills              string `json:"kills"`
-	Assists            string `json:"assists"`
-	Deaths             string `json:"deaths"`
-	KDRatio            string `json:"kd_ratio"`
-	MVPs               string `json:"mvps"`
-	TripleKills        string `json:"triple_kills"`
-	QuadroKills        string `json:"quadro_kills"`
-	PentaKills         string `json:"penta_kills"`
-	HeadshotPercentage string `json:"headshot_percentage"`
-	ADR                string `json:"adr"`
-	CounterStrafing    string `json:"counter_strafing"`
-	FlashAssists       string `json:"flash_assists"`
-	EnemiesFlashed     string `json:"enemies_flashed"`
-	TeamFlashed        string `json:"team_flashed"`
-	HEDamage           string `json:"he_damage"`
-	FireDamage         string `json:"fire_damage"`
-	FlashesThrown      string `json:"flashes_thrown"`
+	ID              string `json:"player_id"`
+	TeamID          string `json:"team_id"`
+	Name            string `json:"nickname"`
+	Kills           string `json:"kills"`
+	Assists         string `json:"assists"`
+	Deaths          string `json:"deaths"`
+	DuoKills        string `json:"duo_kills"`
+	TripleKills     string `json:"triple_kills"`
+	QuadroKills     string `json:"quadro_kills"`
+	PentaKills      string `json:"penta_kills"`
+	Headshots       string `json:"headshots"`
+	ADR             string `json:"adr"`
+	CounterStrafing string `json:"counter_strafing"`
+	FlashAssists    string `json:"flash_assists"`
+	EnemiesFlashed  string `json:"enemies_flashed"`
+	TeamFlashed     string `json:"team_flashed"`
+	HEDamage        string `json:"he_damage"`
+	FireDamage      string `json:"fire_damage"`
+	FlashesThrown   string `json:"flashes_thrown"`
+	Avatar          string `json:"avatar"`
+	FaceitLevel     string `json:"faceit_level"`
 }
 
 type Match struct {
@@ -295,6 +296,14 @@ func createMatchData(matchID string) Match {
 
 	// Loop through allPlayerStats and update with demoStats
 	for i := range allPlayerStats {
+		allPlayerStats[i].Kills = strconv.Itoa(allDemoStats["Kills"][allPlayerStats[i].Name])
+		allPlayerStats[i].Deaths = strconv.Itoa(allDemoStats["Deaths"][allPlayerStats[i].Name])
+		allPlayerStats[i].Assists = strconv.Itoa(allDemoStats["Assists"][allPlayerStats[i].Name])
+		allPlayerStats[i].Headshots = strconv.Itoa(allDemoStats["Headshots"][allPlayerStats[i].Name])
+		allPlayerStats[i].DuoKills = strconv.Itoa(allDemoStats["DuoKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].TripleKills = strconv.Itoa(allDemoStats["TripleKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].QuadroKills = strconv.Itoa(allDemoStats["QuadroKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].PentaKills = strconv.Itoa(allDemoStats["PentaKills"][allPlayerStats[i].Name])
 		allPlayerStats[i].ADR = strconv.Itoa(allDemoStats["ADR"][allPlayerStats[i].Name])
 		allPlayerStats[i].CounterStrafing = strconv.Itoa(allDemoStats["CounterStrafing"][allPlayerStats[i].Name])
 		allPlayerStats[i].FlashAssists = strconv.Itoa(allDemoStats["FlashAssists"][allPlayerStats[i].Name])
@@ -315,6 +324,7 @@ func createMatchData(matchID string) Match {
 }
 
 func getFaceitData(matchID string) (MatchInfo, []TeamInfo, []PlayerStats) {
+	//GET DATA FROM MATCH STATS API
 	url := "https://open.faceit.com/data/v4/matches/" + matchID + "/stats"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -343,26 +353,54 @@ func getFaceitData(matchID string) (MatchInfo, []TeamInfo, []PlayerStats) {
 	}
 
 	// Read the response body into a byte slice
-	bodyBytes, err := io.ReadAll(res.Body)
+	matchStatsBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 	}
 
-	// Parse JSON using gjson
-	jsonStr := gjson.ParseBytes(bodyBytes)
+	// GET DATA FROM MATCH API
+	url1 := "https://open.faceit.com/data/v4/matches/" + matchID
+	req1, err := http.NewRequest("GET", url1, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	teamInfo, playerData := getPlayerData(jsonStr)
+	req1.Header.Add("accept", "application/json")
+	req1.Header.Add("Authorization", "Bearer 8f1de641-442d-4e79-9795-505a59bafca8")
 
-	matchInfo := getMatchInfo(jsonStr)
+	// Create a custom transport with TLS settings
+	tr1 := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true, // Disabling SSL certificate validation
+		},
+	}
+	client1 := &http.Client{Transport: tr1}
 
-	return matchInfo, teamInfo, playerData
-}
+	res1, err := client1.Do(req1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer res1.Body.Close()
 
-func getPlayerData(jsonStr gjson.Result) ([]TeamInfo, []PlayerStats) {
-	teams := jsonStr.Get("rounds.0.teams").Array()
+	if res1.StatusCode != http.StatusOK {
+		fmt.Println("API request failed")
+	}
 
-	//Create arrays of both structs
-	var players []PlayerStats
+	// Read the response body into a byte slice
+	matchBytes, err := io.ReadAll(res1.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+	}
+
+	// Parse JSON using gjson from match stats api
+	matchStatsData := gjson.ParseBytes(matchStatsBytes)
+	// Parse JSON using gjson from match api
+	matchData := gjson.ParseBytes(matchBytes)
+
+	teams := matchStatsData.Get("rounds.0.teams").Array()
+
+	// CREATE TEAMINFO AND GET DATA FROM API //////////////////////
+	//Create array TeamInfo
 	var teamInfo []TeamInfo
 
 	for _, team := range teams {
@@ -373,78 +411,55 @@ func getPlayerData(jsonStr gjson.Result) ([]TeamInfo, []PlayerStats) {
 		aTeam.FinalScore = team.Get("team_stats.Final Score").String()
 		//Append to created struct
 		teamInfo = append(teamInfo, aTeam)
-
-		//Get playerData array from team object
-		playersData := team.Get("players").Array()
-		for _, playerData := range playersData {
-			player := PlayerStats{}
-			player.ID = playerData.Get("player_id").String()
-			player.Name = playerData.Get("nickname").String()
-			player.TeamID = team.Get("team_id").String()
-			player.Kills = playerData.Get("player_stats.Kills").String()
-			player.Assists = playerData.Get("player_stats.Assists").String()
-			player.Deaths = playerData.Get("player_stats.Deaths").String()
-			player.KDRatio = playerData.Get("player_stats.K/D Ratio").String()
-			player.MVPs = playerData.Get("player_stats.MVPs").String()
-			player.TripleKills = playerData.Get("player_stats.Triple Kills").String()
-			player.QuadroKills = playerData.Get("player_stats.Quadro Kills").String()
-			player.PentaKills = playerData.Get("player_stats.Penta Kills").String()
-			player.HeadshotPercentage = playerData.Get("player_stats.Headshots %").String()
-			players = append(players, player)
-		}
 	}
-
-	return teamInfo, players
-}
-
-func getMatchInfo(jsonStr gjson.Result) MatchInfo {
-	data := jsonStr.Get("rounds.0")
+	/////////////////////////////////////////////////////////////
+	//CREATE MATCHINFO AND GET DATA FROM API/////////////////////
+	match := matchStatsData.Get("rounds.0")
 
 	var matchInfo MatchInfo
 
-	matchInfo.MatchID = data.Get("match_id").String()
-	matchInfo.Map = data.Get("round_stats.Map").String()
-	matchInfo.Winner = data.Get("round_stats.Winner").String()
+	matchInfo.MatchID = match.Get("match_id").String()
+	matchInfo.Map = match.Get("round_stats.Map").String()
+	matchInfo.Winner = match.Get("round_stats.Winner").String()
+	matchInfo.Finished = matchData.Get("finished_at").String()
+	/////////////////////////////////////////////////////////////
+	//CREATE []PLAYERSTATS AND GET DATA FROM MATCH API
+	var playerData []PlayerStats
 
-	url := "https://open.faceit.com/data/v4/matches/" + matchInfo.MatchID
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println(err)
+	matchTeams := matchData.Get("teams")
+
+	faction1 := matchTeams.Get("faction1")
+	faction2 := matchTeams.Get("faction2")
+
+	roster1 := faction1.Get("roster").Array()
+	roster2 := faction2.Get("roster").Array()
+
+	for _, player := range roster1 {
+		//Create players struct
+		aPlayer := PlayerStats{}
+		//Assign data
+		aPlayer.TeamID = faction1.Get("faction_id").String()
+		aPlayer.Avatar = player.Get("avatar").String()
+		aPlayer.Name = player.Get("nickname").String()
+		aPlayer.ID = player.Get("player_id").String()
+		aPlayer.FaceitLevel = player.Get("game_skill_level").String()
+
+		playerData = append(playerData, aPlayer)
+	}
+	for _, player := range roster2 {
+		//Create players struct
+		aPlayer := PlayerStats{}
+		//Assign data
+		aPlayer.TeamID = faction1.Get("faction_id").String()
+		aPlayer.Avatar = player.Get("avatar").String()
+		aPlayer.Name = player.Get("nickname").String()
+		aPlayer.ID = player.Get("player_id").String()
+		aPlayer.FaceitLevel = player.Get("game_skill_level").String()
+
+		playerData = append(playerData, aPlayer)
 	}
 
-	req.Header.Add("accept", "application/json")
-	req.Header.Add("Authorization", "Bearer 8f1de641-442d-4e79-9795-505a59bafca8")
-
-	// Create a custom transport with TLS settings
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true, // Disabling SSL certificate validation
-		},
-	}
-	client := &http.Client{Transport: tr}
-
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		fmt.Println("API request failed")
-	}
-
-	// Read the response body into a byte slice
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-	}
-
-	// Parse JSON using gjson
-	matchRequest := gjson.ParseBytes(bodyBytes)
-
-	matchInfo.Finished = matchRequest.Get("finished_at").String()
-
-	return matchInfo
+	return matchInfo, teamInfo, playerData
 }
 
 func handleDemo(matchID string) map[string]map[string]int {
@@ -550,11 +565,32 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	})
 
 	///////////////////////////////////////////////////
+	//Keep count of multikills
+	multiKillsTracker := make(map[string]int)
+	playerDuoKills := make(map[string]int)
+	playerTripleKills := make(map[string]int)
+	playerQuadroKills := make(map[string]int)
+	playerPentaKills := make(map[string]int)
 
 	//Keep Round count for average calculations
 	numberOfRounds := 1
 	p.RegisterEventHandler(func(e events.RoundEndOfficial) {
 		numberOfRounds++
+		if matchStarted {
+			for player, kills := range multiKillsTracker {
+				switch kills {
+				case 2:
+					playerDuoKills[player]++
+				case 3:
+					playerTripleKills[player]++
+				case 4:
+					playerQuadroKills[player]++
+				case 5:
+					playerPentaKills[player]++
+				}
+			}
+		}
+		multiKillsTracker = make(map[string]int)
 	})
 	/////////////////////////////////////////////////////////////
 
@@ -588,7 +624,6 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	// Calculate enemies flashed
 	playerEnemiesFlashed := make(map[string]int)
 	playerTeamFlashed := make(map[string]int)
-	//flashedEvents := make(map[string]string)
 
 	flashEvents := make(map[string]FlashEventPair)
 
@@ -609,12 +644,32 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 
 	// Calculate flash assists
 	playerFlashAssists := make(map[string]int)
+	// Calculate total kills
+	playerTotalKills := make(map[string]int)
+	// Calculate total assists
+	playerTotalAssists := make(map[string]int)
+	// Calculate total deaths
+	playerTotalDeaths := make(map[string]int)
+	// Calculate headshotKills
+	playerTotalHeadshots := make(map[string]int)
+
 	p.RegisterEventHandler(func(e events.Kill) {
+		if matchStarted {
+			playerTotalDeaths[e.Victim.Name]++
+		}
 		if e.Killer != nil && e.Killer.Team != e.Victim.Team && matchStarted {
+			playerTotalKills[e.Killer.Name]++
+			multiKillsTracker[e.Killer.Name]++
+			if e.IsHeadshot {
+				playerTotalHeadshots[e.Killer.Name]++
+			}
 			if e.Victim.IsBlinded() {
 				if flashEvents[e.Victim.Name].Round == numberOfRounds {
 					playerFlashAssists[flashEvents[e.Victim.Name].Attacker]++
 				}
+			}
+			if e.Assister != nil && e.Killer.Team == e.Assister.Team {
+				playerTotalAssists[e.Assister.Name]++
 			}
 		}
 	})
@@ -708,7 +763,17 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 		playerCounterStrafing[player] = int(math.Ceil(float64(playerGoodStrafing[player]) / float64(shots) * 100))
 	}
 
+	fmt.Println(playerTotalKills)
+
 	demoStats := map[string]map[string]int{
+		"Kills":           playerTotalKills,
+		"Assists":         playerTotalAssists,
+		"Deaths":          playerTotalDeaths,
+		"Headshots":       playerTotalHeadshots,
+		"DuoKills":        playerDuoKills,
+		"TripleKills":     playerTripleKills,
+		"QuadroKills":     playerQuadroKills,
+		"PentaKills":      playerPentaKills,
 		"ADR":             playerDamageMap,
 		"FlashesThrown":   playerFlashThrown,
 		"EnemiesFlashed":  playerEnemiesFlashed,

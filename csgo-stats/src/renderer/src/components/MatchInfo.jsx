@@ -38,7 +38,7 @@ function MatchInfo({ data, userId, index }) {
       </div>
       <div className="last-three-match-bottom">
         <span className="last-three-stat">{userStats.kills} Kills</span>
-        <span className="last-three-stat">{userStats.kd_ratio} K/D Ratio</span>
+        <span className="last-three-stat">{(userStats.kills / userStats.deaths).toFixed(2)} K/D Ratio</span>
         <span className="last-three-stat">{userStats.adr} ADR</span>
       </div>
     </div>

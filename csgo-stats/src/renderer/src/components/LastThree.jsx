@@ -14,4 +14,3 @@ function LastThree({ data, userId }) {
 
 export default LastThree
 
-r

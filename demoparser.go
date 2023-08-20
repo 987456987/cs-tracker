@@ -450,7 +450,7 @@ func getFaceitData(matchID string) (MatchInfo, []TeamInfo, []PlayerStats) {
 		//Create players struct
 		aPlayer := PlayerStats{}
 		//Assign data
-		aPlayer.TeamID = faction1.Get("faction_id").String()
+		aPlayer.TeamID = faction2.Get("faction_id").String()
 		aPlayer.Avatar = player.Get("avatar").String()
 		aPlayer.Name = player.Get("nickname").String()
 		aPlayer.ID = player.Get("player_id").String()
@@ -762,8 +762,6 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	for player, shots := range playerStrafingTotal {
 		playerCounterStrafing[player] = int(math.Ceil(float64(playerGoodStrafing[player]) / float64(shots) * 100))
 	}
-
-	fmt.Println(playerTotalKills)
 
 	demoStats := map[string]map[string]int{
 		"Kills":           playerTotalKills,

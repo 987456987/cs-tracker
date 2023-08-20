@@ -3,6 +3,24 @@ function MatchList({ data, userId }) {
     return match.match_stats.findIndex((player) => player.player_id === userId)
   }
 
+  function formatTimeAgo(unixTime) {
+    const currentTime = new Date()
+    const matchTime = new Date(unixTime * 1000) // Convert Unix time to milliseconds
+    const timeDifference = currentTime - matchTime
+    const minutesAgo = Math.floor(timeDifference / (1000 * 60))
+    const hoursAgo = Math.floor(minutesAgo / 60)
+
+    if (hoursAgo < 1) {
+      return `${minutesAgo} minutes ago`
+    } else if (hoursAgo < 24) {
+      return `${hoursAgo} hours ago`
+    } else if (hoursAgo < 48) {
+      return `Yesterday`
+    } else {
+      return convertUnixToYMD(unixTime) // If more than 24 hours, use the original conversion
+    }
+  }
+
   return (
     <>
       <table border="1">
@@ -19,7 +37,7 @@ function MatchList({ data, userId }) {
           {data.map((match) => (
             <tr key={match.match_info.match_id}>
               <td>{match.match_info.map}</td>
-              <td>{convertUnixToYMD(match.match_info.finished)}</td>
+              <td>{formatTimeAgo(match.match_info.finished)}</td>
               {getUserIndex(match) !== -1 ? (
                 <>
                   <td>{match.match_stats[getUserIndex(match)].kills}</td>

@@ -58,11 +58,7 @@ function convertUnixToYMD(unixTime) {
 }
 
 function getUserIndex(match, userId) {
-  for (let i = 0; i < match.match_stats.length; i++) {
-    if (userId == match.match_stats[i].player_id) {
-      return i
-    }
-  }
+    return match.match_stats.findIndex((player) => player.player_id === userId)
 }
 
 export default MatchInfo

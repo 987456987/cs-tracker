@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import LastThree from './components/LastThree'
 import UserIdInput from './components/UserIdInput'
 import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
-// import MatchList from './components/MatchList'
+import MatchList from './components/MatchList'
 // import Match from './components/Match'
 
 function formatDuration(durationMs) {
@@ -138,6 +138,7 @@ function App() {
       <>
         <header className="App-header"></header>
         <LastThree data={data} userId={userId} />
+        <MatchList data={data} userId={userId} />
       </>
     ) : (
       <UserIdInput

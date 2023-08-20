@@ -25,28 +25,27 @@ type ServeData struct {
 }
 
 type PlayerStats struct {
-	ID                 string `json:"player_id"`
-	TeamID             string `json:"team_id"`
-	Name               string `json:"nickname"`
-	Kills              string `json:"kills"`
-	Assists            string `json:"assists"`
-	Deaths             string `json:"deaths"`
-	KDRatio            string `json:"kd_ratio"`
-	MVPs               string `json:"mvps"`
-	TripleKills        string `json:"triple_kills"`
-	QuadroKills        string `json:"quadro_kills"`
-	PentaKills         string `json:"penta_kills"`
-	HeadshotPercentage string `json:"headshot_percentage"`
-	ADR                string `json:"adr"`
-	CounterStrafing    string `json:"counter_strafing"`
-	FlashAssists       string `json:"flash_assists"`
-	EnemiesFlashed     string `json:"enemies_flashed"`
-	TeamFlashed        string `json:"team_flashed"`
-	HEDamage           string `json:"he_damage"`
-	FireDamage         string `json:"fire_damage"`
-	FlashesThrown      string `json:"flashes_thrown"`
-	Avatar             string `json:"avatar"`
-	FaceitLevel        string `json:"faceit_level"`
+	ID              string `json:"player_id"`
+	TeamID          string `json:"team_id"`
+	Name            string `json:"nickname"`
+	Kills           string `json:"kills"`
+	Assists         string `json:"assists"`
+	Deaths          string `json:"deaths"`
+	DuoKills        string `json:"duo_kills"`
+	TripleKills     string `json:"triple_kills"`
+	QuadroKills     string `json:"quadro_kills"`
+	PentaKills      string `json:"penta_kills"`
+	Headshots       string `json:"headshots"`
+	ADR             string `json:"adr"`
+	CounterStrafing string `json:"counter_strafing"`
+	FlashAssists    string `json:"flash_assists"`
+	EnemiesFlashed  string `json:"enemies_flashed"`
+	TeamFlashed     string `json:"team_flashed"`
+	HEDamage        string `json:"he_damage"`
+	FireDamage      string `json:"fire_damage"`
+	FlashesThrown   string `json:"flashes_thrown"`
+	Avatar          string `json:"avatar"`
+	FaceitLevel     string `json:"faceit_level"`
 }
 
 type Match struct {
@@ -297,6 +296,14 @@ func createMatchData(matchID string) Match {
 
 	// Loop through allPlayerStats and update with demoStats
 	for i := range allPlayerStats {
+		allPlayerStats[i].Kills = strconv.Itoa(allDemoStats["Kills"][allPlayerStats[i].Name])
+		allPlayerStats[i].Deaths = strconv.Itoa(allDemoStats["Deaths"][allPlayerStats[i].Name])
+		allPlayerStats[i].Assists = strconv.Itoa(allDemoStats["Assists"][allPlayerStats[i].Name])
+		allPlayerStats[i].Headshots = strconv.Itoa(allDemoStats["Headshots"][allPlayerStats[i].Name])
+		allPlayerStats[i].DuoKills = strconv.Itoa(allDemoStats["DuoKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].TripleKills = strconv.Itoa(allDemoStats["TripleKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].QuadroKills = strconv.Itoa(allDemoStats["QuadroKills"][allPlayerStats[i].Name])
+		allPlayerStats[i].PentaKills = strconv.Itoa(allDemoStats["PentaKills"][allPlayerStats[i].Name])
 		allPlayerStats[i].ADR = strconv.Itoa(allDemoStats["ADR"][allPlayerStats[i].Name])
 		allPlayerStats[i].CounterStrafing = strconv.Itoa(allDemoStats["CounterStrafing"][allPlayerStats[i].Name])
 		allPlayerStats[i].FlashAssists = strconv.Itoa(allDemoStats["FlashAssists"][allPlayerStats[i].Name])
@@ -558,11 +565,32 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	})
 
 	///////////////////////////////////////////////////
+	//Keep count of multikills
+	multiKillsTracker := make(map[string]int)
+	playerDuoKills := make(map[string]int)
+	playerTripleKills := make(map[string]int)
+	playerQuadroKills := make(map[string]int)
+	playerPentaKills := make(map[string]int)
 
 	//Keep Round count for average calculations
 	numberOfRounds := 1
 	p.RegisterEventHandler(func(e events.RoundEndOfficial) {
 		numberOfRounds++
+		if matchStarted {
+			for player, kills := range multiKillsTracker {
+				switch kills {
+				case 2:
+					playerDuoKills[player]++
+				case 3:
+					playerTripleKills[player]++
+				case 4:
+					playerQuadroKills[player]++
+				case 5:
+					playerPentaKills[player]++
+				}
+			}
+		}
+		multiKillsTracker = make(map[string]int)
 	})
 	/////////////////////////////////////////////////////////////
 
@@ -617,12 +645,31 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 
 	// Calculate flash assists
 	playerFlashAssists := make(map[string]int)
+	// Calculate total kills
+	playerTotalKills := make(map[string]int)
+	// Calculate total assists
+	playerTotalAssists := make(map[string]int)
+	// Calculate total deaths
+	playerTotalDeaths := make(map[string]int)
+	// Calculate headshotKills
+	playerTotalHeadshots := make(map[string]int)
+
 	p.RegisterEventHandler(func(e events.Kill) {
+		if matchStarted {
+			playerTotalDeaths[e.Victim.Name]++
+		}
 		if e.Killer != nil && e.Killer.Team != e.Victim.Team && matchStarted {
+			playerTotalKills[e.Killer.Name]++
+			if e.IsHeadshot {
+				playerTotalHeadshots[e.Killer.Name]++
+			}
 			if e.Victim.IsBlinded() {
 				if flashEvents[e.Victim.Name].Round == numberOfRounds {
 					playerFlashAssists[flashEvents[e.Victim.Name].Attacker]++
 				}
+			}
+			if e.Killer.Team == e.Assister.Team {
+				playerTotalAssists[e.Assister.Name]++
 			}
 		}
 	})
@@ -717,6 +764,14 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	}
 
 	demoStats := map[string]map[string]int{
+		"Kills":           playerTotalKills,
+		"Assists":         playerTotalAssists,
+		"Deaths":          playerTotalDeaths,
+		"Headshots":       playerTotalHeadshots,
+		"DuoKills":        playerDuoKills,
+		"TripleKills":     playerTripleKills,
+		"QuadroKills":     playerQuadroKills,
+		"PentaKills":      playerPentaKills,
 		"ADR":             playerDamageMap,
 		"FlashesThrown":   playerFlashThrown,
 		"EnemiesFlashed":  playerEnemiesFlashed,

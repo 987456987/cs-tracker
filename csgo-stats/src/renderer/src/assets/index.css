@@ -103,9 +103,9 @@ body {
 table {
   font-size: 18px;
   background-color: var(--foreground-color);
+  padding: 2em 0;
 }
 tr {
-  
   border-top: solid 1px;
 }
 td {

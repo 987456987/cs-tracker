@@ -76,6 +76,7 @@ function MatchList({ data, userId }) {
                   <td>N/A</td>
                   <td>N/A</td>
                   <td>N/A</td>
+                  <td>N/A</td>
                 </>
               )}
             </tr>

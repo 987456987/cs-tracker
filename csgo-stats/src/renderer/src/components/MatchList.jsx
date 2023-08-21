@@ -1,3 +1,5 @@
+import '../assets/match_list.css'
+
 function MatchList({ data, userId }) {
   function getUserIndex(match) {
     return match.match_stats.findIndex((player) => player.player_id === userId)
@@ -22,8 +24,8 @@ function MatchList({ data, userId }) {
   }
 
   return (
-    <>
-      <table border="1">
+    <div className="match-list">
+      <table>
         <thead>
           <tr>
             <th>Map</th>
@@ -36,7 +38,7 @@ function MatchList({ data, userId }) {
         <tbody>
           {data.map((match) => (
             <tr key={match.match_info.match_id}>
-              <td>{match.match_info.map}</td>
+              <td className="td-map"><div className="match.match_info.map"></div>{match.match_info.map}</td>
               <td>{formatTimeAgo(match.match_info.finished)}</td>
               {getUserIndex(match) !== -1 ? (
                 <>
@@ -55,7 +57,7 @@ function MatchList({ data, userId }) {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   )
 }
 

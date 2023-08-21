@@ -23,6 +23,14 @@ function MatchList({ data, userId }) {
     }
   }
 
+  function getScore(match) {
+    const userIndex = getUserIndex(match, userId)
+    const userStats = match.match_stats[userIndex]
+    return match.team_info[0].team_id === userStats.team_id
+      ? [match.team_info[0].final_score, match.team_info[1].final_score]
+      : [match.team_info[1].final_score, match.team_info[0].final_score]
+  }
+
   return (
     <div className="match-list">
       <table>
@@ -30,6 +38,7 @@ function MatchList({ data, userId }) {
           <tr>
             <th>Map</th>
             <th>Date</th>
+            <th>Score</th>
             <th>Kills</th>
             <th>Deaths</th>
             <th>ADR</th>
@@ -38,10 +47,26 @@ function MatchList({ data, userId }) {
         <tbody>
           {data.map((match) => (
             <tr key={match.match_info.match_id}>
-              <td className="td-map"><div className="match.match_info.map"></div>{match.match_info.map}</td>
+              <td className="td-map">
+                <div className={`${match.match_info.map}_logo`}></div>
+                {match.match_info.map}
+              </td>
               <td>{formatTimeAgo(match.match_info.finished)}</td>
               {getUserIndex(match) !== -1 ? (
                 <>
+                  <td>
+                    <span
+                      className={
+                        parseInt(getScore(match)[0]) > parseInt(getScore(match)[1])
+                          ? 'winner'
+                          : 'loser'
+                      }
+                    >
+                      {' '}
+                      {getScore(match)[0]}
+                    </span>
+                    <span>/{getScore(match)[1]}</span>
+                  </td>
                   <td>{match.match_stats[getUserIndex(match)].kills}</td>
                   <td>{match.match_stats[getUserIndex(match)].deaths}</td>
                   <td>{match.match_stats[getUserIndex(match)].adr}</td>

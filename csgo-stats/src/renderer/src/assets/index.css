@@ -104,9 +104,16 @@ table {
   font-size: 18px;
   background-color: var(--foreground-color);
 }
+tr {
+  
+  border-top: solid 1px;
+}
 td {
   padding: 1.5em;
 }
 .td-map {
   padding-right: 3em;
+  display: flex;
+  align-items: center;
+  gap: 2em;
 }

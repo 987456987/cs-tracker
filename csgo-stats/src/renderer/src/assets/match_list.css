@@ -1,0 +1,67 @@
+* {
+    --logo-size: 50px;
+}
+
+.de_inferno_logo {
+    background-image: url("../assets/images/logos/map_icon_de_inferno.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_ancient_logo {
+    background-image: url("../assets/images/logos/map_icon_de_ancient.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_anubis_logo {
+    background-image: url("../assets/images/logos/map_icon_de_anubis.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_mirage_logo {
+    background-image: url("../assets/images/logos/map_icon_de_mirage.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_nuke_logo {
+    background-image: url("../assets/images/logos/map_icon_de_nuke.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_overpass_logo {
+    background-image: url("../assets/images/logos/map_icon_de_overpass.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_vertigo_logo {
+    background-image: url("../assets/images/logos/map_icon_de_vertigo.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+  
+  .de_dust2_logo {
+    background-image: url("../assets/images/logos/map_icon_de_dust2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }

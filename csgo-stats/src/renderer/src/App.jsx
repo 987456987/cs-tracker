@@ -136,9 +136,7 @@ function App() {
   function renderHome() {
     return userId ? (
       <>
-        <header className="App-header"></header>
         <LastThree data={data} userId={userId} />
-        <MatchList data={data} userId={userId} />
       </>
     ) : (
       <UserIdInput
@@ -155,8 +153,13 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
+      <header className="App-header">
+      <Link to="/" className='header-link'>Home</Link>
+      <Link to="/matchlist" className='header-link'>Matches</Link>
+      </header>
         <Routes>
           <Route path="/" element={renderHome()} />
+          <Route path="/matchlist" element={MatchList({ data, userId })} />
           {/* <Route path="/match/:matchId" element={<Match />} /> */}
         </Routes>
       </div>

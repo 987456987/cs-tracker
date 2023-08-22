@@ -117,3 +117,11 @@ td {
   align-items: center;
   gap: 2em;
 }
+.header-link {
+  padding: 2em;
+  color: white;
+  text-decoration: none;
+}
+.header-link:hover {
+  color: var(--highlight-color);
+}

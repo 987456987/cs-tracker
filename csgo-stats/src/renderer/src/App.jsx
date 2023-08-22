@@ -4,6 +4,7 @@ import LastThree from './components/LastThree'
 import UserIdInput from './components/UserIdInput'
 import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
 import MatchList from './components/MatchList'
+import UserStats from './components/UserStats'
 // import Match from './components/Match'
 
 function formatDuration(durationMs) {
@@ -137,6 +138,7 @@ function App() {
     return userId ? (
       <>
         <LastThree data={data} userId={userId} />
+        <UserStats data={data} userId={userId} />
       </>
     ) : (
       <UserIdInput

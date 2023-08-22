@@ -118,7 +118,7 @@ td {
   gap: 2em;
 }
 .header-link {
-  padding: 2em;
+  padding: 0 2em;
   color: white;
   text-decoration: none;
 }

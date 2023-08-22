@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/prop-types */
 import '../assets/last_three.css'
+import { Link } from 'react-router-dom'
 
 function MatchInfo({ data, userId, index }) {
   const match = data[index]
@@ -19,28 +20,32 @@ function MatchInfo({ data, userId, index }) {
 
   return (
     <div className="last-three-match">
-      <div className={`${match.match_info.map} last-three-match-top`}>
-        <div className="last-three-info">
-          <div className="last-three-top">
-            <h2 className="capitalize">
-              {mapName}
-              <span className={parseInt(teamScoreA) > parseInt(teamScoreB) ? 'winner' : 'loser'}>
-                {' '}
-                {teamScoreA}
-              </span>
-              <span>/{teamScoreB}</span>
-            </h2>
-          </div>
-          <div className="last-three-bottom">
-            <h3>{convertUnixToYMD(match.match_info.finished)}</h3>
+      <Link to="/matchlist" className="custom-link">
+        <div className={`${match.match_info.map} last-three-match-top`}>
+          <div className="last-three-info">
+            <div className="last-three-top">
+              <h2 className="capitalize">
+                {mapName}
+                <span className={parseInt(teamScoreA) > parseInt(teamScoreB) ? 'winner' : 'loser'}>
+                  {' '}
+                  {teamScoreA}
+                </span>
+                <span>/{teamScoreB}</span>
+              </h2>
+            </div>
+            <div className="last-three-bottom">
+              <h3>{convertUnixToYMD(match.match_info.finished)}</h3>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="last-three-match-bottom">
-        <span className="last-three-stat">{userStats.kills} Kills</span>
-        <span className="last-three-stat">{(userStats.kills / userStats.deaths).toFixed(2)} K/D Ratio</span>
-        <span className="last-three-stat">{userStats.adr} ADR</span>
-      </div>
+        <div className="last-three-match-bottom">
+          <span className="last-three-stat">{userStats.kills} Kills</span>
+          <span className="last-three-stat">
+            {(userStats.kills / userStats.deaths).toFixed(2)} K/D Ratio
+          </span>
+          <span className="last-three-stat">{userStats.adr} ADR</span>
+        </div>
+      </Link>
     </div>
   )
 }
@@ -58,7 +63,7 @@ function convertUnixToYMD(unixTime) {
 }
 
 function getUserIndex(match, userId) {
-    return match.match_stats.findIndex((player) => player.player_id === userId)
+  return match.match_stats.findIndex((player) => player.player_id === userId)
 }
 
 export default MatchInfo

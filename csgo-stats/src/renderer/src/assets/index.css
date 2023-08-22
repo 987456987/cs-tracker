@@ -125,3 +125,10 @@ td {
 .header-link:hover {
   color: var(--highlight-color);
 }
+.custom-link {
+  color: inherit;
+  text-decoration: none;
+}
+.last-three-match:hover {
+  box-shadow: 0 0 5px 5px white;
+}

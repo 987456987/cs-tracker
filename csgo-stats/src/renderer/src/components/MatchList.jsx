@@ -1,4 +1,5 @@
 import '../assets/match_list.css'
+import { Link } from 'react-router-dom'
 
 function MatchList({ data, userId }) {
   function getUserIndex(match) {
@@ -46,40 +47,42 @@ function MatchList({ data, userId }) {
         </thead>
         <tbody>
           {data.map((match) => (
-            <tr key={match.match_info.match_id}>
-              <td className="td-map">
-                <div className={`${match.match_info.map}_logo`}></div>
-                {match.match_info.map}
-              </td>
-              <td>{formatTimeAgo(match.match_info.finished)}</td>
-              {getUserIndex(match) !== -1 ? (
-                <>
-                  <td>
-                    <span
-                      className={
-                        parseInt(getScore(match)[0]) > parseInt(getScore(match)[1])
-                          ? 'winner'
-                          : 'loser'
-                      }
-                    >
-                      {' '}
-                      {getScore(match)[0]}
-                    </span>
-                    <span>/{getScore(match)[1]}</span>
-                  </td>
-                  <td>{match.match_stats[getUserIndex(match)].kills}</td>
-                  <td>{match.match_stats[getUserIndex(match)].deaths}</td>
-                  <td>{match.match_stats[getUserIndex(match)].adr}</td>
-                </>
-              ) : (
-                <>
-                  <td>N/A</td>
-                  <td>N/A</td>
-                  <td>N/A</td>
-                  <td>N/A</td>
-                </>
-              )}
-            </tr>
+              <tr key={match.match_info.match_id}>
+              
+                <td className="td-map">
+                  <div className={`${match.match_info.map}_logo`}></div>
+                  {match.match_info.map}
+                </td>
+                <td>{formatTimeAgo(match.match_info.finished)}</td>
+                {getUserIndex(match) !== -1 ? (
+                  <>
+                    <td>
+                      <span
+                        className={
+                          parseInt(getScore(match)[0]) > parseInt(getScore(match)[1])
+                            ? 'winner'
+                            : 'loser'
+                        }
+                      >
+                        {' '}
+                        {getScore(match)[0]}
+                      </span>
+                      <span>/{getScore(match)[1]}</span>
+                    </td>
+                    <td>{match.match_stats[getUserIndex(match)].kills}</td>
+                    <td>{match.match_stats[getUserIndex(match)].deaths}</td>
+                    <td>{match.match_stats[getUserIndex(match)].adr}</td>
+                  </>
+                ) : (
+                  <>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                  </>
+                )}
+                <td><Link to="/">View</Link></td>
+              </tr>
           ))}
         </tbody>
       </table>

@@ -132,3 +132,9 @@ td {
 .last-three-match:hover {
   box-shadow: 0 0 15px 5px white;
 }
+
+.chart-container {
+  background-color: var(--foreground-color);
+  width: fit-content;
+  padding: 2em;
+}

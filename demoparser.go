@@ -240,7 +240,7 @@ func main() {
 
 func getMatchList(userID string) []string {
 	//user := "52e19c3d-471c-44ac-af67-a394da815a37"
-	url := "https://open.faceit.com/data/v4/players/" + userID + "/history?game=csgo&offset=0&limit=10"
+	url := "https://open.faceit.com/data/v4/players/" + userID + "/history?game=csgo&offset=0&limit=50"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println(err)

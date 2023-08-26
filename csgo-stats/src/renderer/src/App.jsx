@@ -5,7 +5,7 @@ import UserIdInput from './components/UserIdInput'
 import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
 import MatchList from './components/MatchList'
 import UserStats from './components/UserStats'
-// import Match from './components/Match'
+import Match from './components/Match'
 
 function formatDuration(durationMs) {
   if (durationMs < 1000) {
@@ -162,7 +162,7 @@ function App() {
         <Routes>
           <Route path="/" element={renderHome()} />
           <Route path="/matchlist" element={MatchList({ data, userId })} />
-          {/* <Route path="/match/:matchId" element={<Match />} /> */}
+          <Route path="/match/:matchId" element={<Match />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -20,7 +20,7 @@ function MatchInfo({ data, userId, index }) {
 
   return (
     <div className="last-three-match">
-      <Link to="/matchlist" className="custom-link">
+      <Link to={`/match/${match.match_info.match_id}`} className="custom-link">
         <div className={`${match.match_info.map} last-three-match-top`}>
           <div className="last-three-info">
             <div className="last-three-top">

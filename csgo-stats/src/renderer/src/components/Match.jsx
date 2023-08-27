@@ -19,6 +19,7 @@ function Match({ data }) {
               <th>Assists</th>
               <th>Deaths</th>
               <th>ADR</th>
+              <th>Counter Strafe</th>
             </tr>
           </thead>
           <tbody>
@@ -29,6 +30,7 @@ function Match({ data }) {
                 <td>{player.assists}</td>
                 <td>{player.deaths}</td>
                 <td>{player.adr}</td>
+                <td>{player.counter_strafing}</td>
               </tr>
             ))}
           </tbody>

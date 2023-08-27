@@ -579,8 +579,9 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 				for _, player := range p.GameState().Participants().Playing() {
 					// If the shooter has spotted a player from the enemy team
 					if player.Team != e.Shooter.Team && player.IsAlive() /*&& player.IsSpottedBy(e.Shooter)*/ {
-						const AngleThreshold = .1 // For example, 0.5 radians ~ 28.6 degrees
-						const MaxDistance = 2000  // Max distance
+						//const AngleThreshold = .1 // For example, 0.5 radians ~ 28.6 degrees
+						const MaxDistance = 3000 // Max distance
+						var AngleThreshold float64
 
 						// Calculate vector from observing player to observed player (X and Y axes only)
 						diffX := player.Position().X - e.Shooter.Position().X
@@ -588,6 +589,14 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 
 						// Calculate the squared distance between players (to avoid square root calculation)
 						distanceSquared := diffX*diffX + diffY*diffY
+
+						if distanceSquared > 2000*2000 {
+							AngleThreshold = .1
+						} else if distanceSquared > 1000*1000 {
+							AngleThreshold = .75
+						} else {
+							AngleThreshold = 1.25
+						}
 
 						// Calculate the magnitudes of both vectors
 						observingPlayerToPlayerMagnitude := math.Sqrt(diffX*diffX + diffY*diffY)

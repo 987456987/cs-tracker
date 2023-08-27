@@ -1,12 +1,12 @@
 package main
 
+//1-c36ad4b8-eb87-488a-8681-b223dfe761d4
+
 import (
 	"compress/gzip"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"os"
@@ -83,159 +83,8 @@ type UserMatches struct {
 var checkMatchesMutex sync.Mutex
 
 func main() {
-	http.HandleFunc("/check-matches", func(w http.ResponseWriter, r *http.Request) {
-		// Handle CORS headers for preflight and actual requests
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		checkMatchesMutex.Lock()
-		defer checkMatchesMutex.Unlock()
-
-		if r.Method == http.MethodOptions {
-			// Preflight request, respond with OK
-			w.WriteHeader(http.StatusOK)
-			return
-		} else if r.Method == http.MethodPost {
-			// Parse the JSON request body
-			var requestData RequestData
-			err := json.NewDecoder(r.Body).Decode(&requestData)
-			if err != nil {
-				http.Error(w, "Error decoding JSON", http.StatusBadRequest)
-				return
-			}
-
-			filename := requestData.UserID + ".json"
-
-			// Create a variable to hold the unmarshaled JSON data
-			var data ServeData
-			// Take requestData.UserID and make a faceit api request to get a list of matches
-			matchList := getMatchList(requestData.UserID)
-			// Var to store the matches missing from stored data
-			var missingMatches []string
-			//Var to store data to be served
-			var jsonResponse ServeData
-
-			// Check if the file exists
-			if _, err := os.Stat(filename); os.IsNotExist(err) {
-				missingMatches = append(missingMatches, matchList...)
-				fmt.Print("Doesnt Exists")
-			} else {
-				//Get stored data to compare against last matches from faceitAPI
-				//Get stored matches from disk
-				fmt.Print("Exists")
-				dataJson, err := os.ReadFile(filename)
-				if err != nil {
-					fmt.Println(err)
-				}
-				// Unmarshal the JSON data into the variable
-				err = json.Unmarshal(dataJson, &data)
-				if err != nil {
-					fmt.Println(err)
-				}
-				for _, faceitMatch := range matchList {
-					found := false
-					for _, storedMatch := range data.Matches {
-						if faceitMatch == storedMatch.MatchInfo.MatchID {
-							found = true
-							break
-						}
-					}
-					if !found {
-						missingMatches = append(missingMatches, faceitMatch)
-						fmt.Println("Added " + faceitMatch + " to the needed match list")
-					}
-				}
-				//Append stored matches to response
-				jsonResponse.Matches = append(jsonResponse.Matches, data.Matches...)
-			}
-
-			/////////////////////////////////////////////////////////////////////
-
-			//Extract data from missing matches and append to response variable
-			for i, match := range missingMatches {
-				matchData := createMatchData(match)
-				jsonResponse.Matches = append(jsonResponse.Matches, matchData)
-				fmt.Println(strconv.Itoa(i+1) + " out of " + strconv.Itoa(len(missingMatches)))
-
-				// Convert players slice to JSON
-				playersJSON, err := json.Marshal(jsonResponse)
-				if err != nil {
-					fmt.Println("Error converting players to JSON:", err)
-					continue // Skip writing and move to the next iteration
-				}
-
-				// Save JSON data to the file
-				outputFile, err := os.Create(filename)
-				if err != nil {
-					fmt.Println("Error creating output file:", err)
-					continue // Skip writing and move to the next iteration
-				}
-				defer outputFile.Close()
-
-				_, err = outputFile.Write(playersJSON)
-				if err != nil {
-					fmt.Println("Error writing JSON data to file:", err)
-				}
-
-				fmt.Println("JSON data saved to players.json")
-			}
-
-			dataJsonFinal, err := os.ReadFile(filename)
-			if err != nil {
-				fmt.Println(err)
-				fmt.Println("Here")
-				fmt.Println(matchList)
-			}
-
-			fmt.Println("JSON data sent")
-
-			//Send the JSON response
-			w.WriteHeader(http.StatusOK)
-			w.Write(dataJsonFinal)
-		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	})
-	http.HandleFunc("/get-matches", func(w http.ResponseWriter, r *http.Request) {
-		// Handle CORS headers for preflight and actual requests
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		if r.Method == http.MethodOptions {
-			// Preflight request, respond with OK
-			w.WriteHeader(http.StatusOK)
-			return
-		} else if r.Method == http.MethodPost {
-
-			// Parse the JSON request body
-			var requestData RequestData
-			err := json.NewDecoder(r.Body).Decode(&requestData)
-			if err != nil {
-				http.Error(w, "Error decoding JSON", http.StatusBadRequest)
-				return
-			}
-
-			filename := requestData.UserID + ".json"
-
-			/////////////////////////////////////////////////////////////////////
-			//Get stored data to compare against last matches from faceitAPI
-			//Get stored matches from disk
-			dataJson, err := os.ReadFile(filename)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			//Send the JSON response
-			w.WriteHeader(http.StatusOK)
-			w.Write(dataJson)
-		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	})
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	//createMatchData("1-c36ad4b8-eb87-488a-8681-b223dfe761d4")
+	createMatchData("1-125b711c-f3f0-41dd-94f4-478411052427")
 }
 
 func getMatchList(userID string) []string {
@@ -729,15 +578,42 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 				// Loop through all players on the opposing team
 				for _, player := range p.GameState().Participants().Playing() {
 					// If the shooter has spotted a player from the enemy team
-					if player.Team != e.Shooter.Team && player.IsAlive() && player.IsSpottedBy(e.Shooter) {
-						if int(velocityMagnitude2D) < weaponMaxSpeed[e.Weapon.String()] {
-							playerGoodStrafing[e.Shooter.Name]++
-							playerStrafingTotal[e.Shooter.Name]++
-							break
-						} else {
-							playerStrafingTotal[e.Shooter.Name]++
-							break
+					if player.Team != e.Shooter.Team && player.IsAlive() /*&& player.IsSpottedBy(e.Shooter)*/ {
+						const AngleThreshold = .1 // For example, 0.5 radians ~ 28.6 degrees
+						const MaxDistance = 2000  // Max distance
+
+						// Calculate vector from observing player to observed player (X and Y axes only)
+						diffX := player.Position().X - e.Shooter.Position().X
+						diffY := player.Position().Y - e.Shooter.Position().Y
+
+						// Calculate the squared distance between players (to avoid square root calculation)
+						distanceSquared := diffX*diffX + diffY*diffY
+
+						// Calculate the magnitudes of both vectors
+						observingPlayerToPlayerMagnitude := math.Sqrt(diffX*diffX + diffY*diffY)
+
+						// Normalize the shooter's view direction vector (if it's not already normalized)
+						shooterViewDirectionMagnitude := math.Sqrt(float64(e.Shooter.ViewDirectionX() * e.Shooter.ViewDirectionX()))
+
+						// Calculate the dot product between normalized vectors
+						dotProduct := ((diffX / observingPlayerToPlayerMagnitude) * (float64(e.Shooter.ViewDirectionX()) / shooterViewDirectionMagnitude)) +
+							((diffY / observingPlayerToPlayerMagnitude) * 0) // Ignore Y component
+
+						// Calculate the angle between vectors in radians
+						angle := math.Acos(dotProduct)
+
+						// Compare angle with threshold
+						if distanceSquared <= MaxDistance*MaxDistance {
+							if angle <= AngleThreshold || player.IsSpottedBy(e.Shooter) {
+								if int(velocityMagnitude2D) < weaponMaxSpeed[e.Weapon.String()] {
+									playerGoodStrafing[e.Shooter.Name]++
+									playerStrafingTotal[e.Shooter.Name]++
+								} else {
+									playerStrafingTotal[e.Shooter.Name]++
+								}
+							}
 						}
+
 					}
 				}
 			}
@@ -762,6 +638,8 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	for player, shots := range playerStrafingTotal {
 		playerCounterStrafing[player] = int(math.Ceil(float64(playerGoodStrafing[player]) / float64(shots) * 100))
 	}
+
+	fmt.Println(playerCounterStrafing)
 
 	demoStats := map[string]map[string]int{
 		"Kills":           playerTotalKills,

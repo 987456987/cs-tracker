@@ -162,7 +162,7 @@ function App() {
         <Routes>
           <Route path="/" element={renderHome()} />
           <Route path="/matchlist" element={MatchList({ data, userId })} />
-          <Route path="/match/:matchId" element={<Match />} />
+          <Route path="/match/:matchId" element={<Match data={data} />} />
         </Routes>
       </div>
     </BrowserRouter>

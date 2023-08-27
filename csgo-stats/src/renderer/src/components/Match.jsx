@@ -1,11 +1,42 @@
 import { useParams } from 'react-router-dom'
 
-function Match() {
+function Match({ data }) {
   const { matchId } = useParams()
-  return (
+  console.log(matchId)
+
+  const currentMatch = data.find((match) => match.match_info.match_id === matchId)
+
+  console.log(currentMatch)
+  if (currentMatch) console.log(currentMatch.match_stats)
+  return currentMatch ? (
     <>
-      <div>{matchId}</div>
+      <div className="match-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Kills</th>
+              <th>Assists</th>
+              <th>Deaths</th>
+              <th>ADR</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentMatch.match_stats.map((player) => (
+              <tr key={player.player_id}>
+                <td>{player.nickname}</td>
+                <td>{player.kills}</td>
+                <td>{player.assists}</td>
+                <td>{player.deaths}</td>
+                <td>{player.adr}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
+  ) : (
+    <></>
   )
 }
 

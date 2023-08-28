@@ -83,8 +83,8 @@ type UserMatches struct {
 var checkMatchesMutex sync.Mutex
 
 func main() {
-	//createMatchData("1-c36ad4b8-eb87-488a-8681-b223dfe761d4")
-	createMatchData("1-125b711c-f3f0-41dd-94f4-478411052427")
+	createMatchData("1-c36ad4b8-eb87-488a-8681-b223dfe761d4")
+	//createMatchData("1-125b711c-f3f0-41dd-94f4-478411052427")
 }
 
 func getMatchList(userID string) []string {
@@ -528,6 +528,7 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 	// Calculate Counterstrafing
 	playerGoodStrafing := make(map[string]int)
 	playerStrafingTotal := make(map[string]int)
+	playerShotsTotal := make(map[string]int)
 
 	p.RegisterEventHandler(func(e events.WeaponFire) {
 		//Valid Weapons
@@ -569,19 +570,22 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 				break
 			}
 		}
+
 		// if match is started and the shot was fired from a valid weapon
 		if isValidWeapon && matchStarted {
 			velocity := e.Shooter.Velocity()
 			velocityMagnitude2D := math.Sqrt(velocity.X*velocity.X + velocity.Y*velocity.Y)
 			// if the player is not ducking and the player is moving
 			if e.Shooter != nil && !e.Shooter.IsDucking() && velocityMagnitude2D > 0 {
+
 				// Loop through all players on the opposing team
 				for _, player := range p.GameState().Participants().Playing() {
+
+					playerShotsTotal[e.Shooter.Name]++
 					// If the shooter has spotted a player from the enemy team
 					if player.Team != e.Shooter.Team && player.IsAlive() /*&& player.IsSpottedBy(e.Shooter)*/ {
-						//const AngleThreshold = .1 // For example, 0.5 radians ~ 28.6 degrees
-						const MaxDistance = 3000 // Max distance
-						var AngleThreshold float64
+						const MaxDistance = 3000   // Max distance
+						var AngleThreshold float64 // For example, 0.5 radians ~ 28.6 degrees
 
 						// Calculate vector from observing player to observed player (X and Y axes only)
 						diffX := player.Position().X - e.Shooter.Position().X
@@ -591,11 +595,11 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 						distanceSquared := diffX*diffX + diffY*diffY
 
 						if distanceSquared > 2000*2000 {
-							AngleThreshold = .1
+							AngleThreshold = .4
 						} else if distanceSquared > 1000*1000 {
 							AngleThreshold = .75
 						} else {
-							AngleThreshold = 1.25
+							AngleThreshold = 1
 						}
 
 						// Calculate the magnitudes of both vectors
@@ -612,13 +616,15 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 						angle := math.Acos(dotProduct)
 
 						// Compare angle with threshold
-						if distanceSquared <= MaxDistance*MaxDistance {
+						if distanceSquared <= MaxDistance*MaxDistance && distanceSquared >= 500*500 {
 							if angle <= AngleThreshold || player.IsSpottedBy(e.Shooter) {
 								if int(velocityMagnitude2D) < weaponMaxSpeed[e.Weapon.String()] {
 									playerGoodStrafing[e.Shooter.Name]++
 									playerStrafingTotal[e.Shooter.Name]++
+									break
 								} else {
 									playerStrafingTotal[e.Shooter.Name]++
+									break
 								}
 							}
 						}
@@ -648,6 +654,13 @@ func extractDemoData(demoURL string) map[string]map[string]int {
 		playerCounterStrafing[player] = int(math.Ceil(float64(playerGoodStrafing[player]) / float64(shots) * 100))
 	}
 
+	fmt.Println("Shots Total")
+	fmt.Println(playerShotsTotal)
+	fmt.Println("Strafing Total")
+	fmt.Println(playerStrafingTotal)
+	fmt.Println("Strafing Good Total")
+	fmt.Println(playerGoodStrafing)
+	fmt.Println("Strafing Score")
 	fmt.Println(playerCounterStrafing)
 
 	demoStats := map[string]map[string]int{

@@ -138,3 +138,9 @@ td {
   width: fit-content;
   padding: 2em;
 }
+
+.scoreboard {
+  display: flex;
+  place-items: center;
+  flex-direction: column;
+}

@@ -9,7 +9,7 @@ function Match({ data }) {
   console.log(currentMatch)
   return currentMatch ? (
     <>
-      <div className="match-list">
+      <div className="scoreboard">
         <table>
           <thead>
             <tr>
@@ -35,7 +35,7 @@ function Match({ data }) {
                   </tr>
                 )
               }
-              return null // Add this line if you want to skip rendering for other teams
+              return null
             })}
           </tbody>
         </table>
@@ -64,7 +64,7 @@ function Match({ data }) {
                   </tr>
                 )
               }
-              return null // Add this line if you want to skip rendering for other teams
+              return null
             })}
           </tbody>
         </table>

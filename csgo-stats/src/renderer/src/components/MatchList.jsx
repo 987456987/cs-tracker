@@ -81,7 +81,7 @@ function MatchList({ data, userId }) {
                     <td>N/A</td>
                   </>
                 )}
-                <td><Link to="/">View</Link></td>
+                <td><Link to={`/match/${match.match_info.match_id}`}>View</Link></td>
               </tr>
           ))}
         </tbody>

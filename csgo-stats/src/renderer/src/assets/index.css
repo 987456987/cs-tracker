@@ -144,3 +144,11 @@ td {
   place-items: center;
   flex-direction: column;
 }
+
+.view-match {
+  color: white;
+  border: solid white 2px;
+  border-radius: 5px;
+  display: grid;
+  place-content: center;
+}
